@@ -5,15 +5,24 @@
   "main": "index.js",
   "devDependencies": {
     "@types/node": "^24.9.1",
+    "biome": "^0.3.3",
+    "jest": "^30.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
   "scripts": {
     "dev": "ts-node src/app.ts",
     "build": "tsc",
-    "start": "node build/app.js"
+    "start": "node build/app.js",
+    "lint": "biome lint",
+    "lint:fix": "biome lint --write",
+    "format": "biome format",
+    "format:fix": "biome format --write",
+    "test": "jest",
+    "test:coverage": "jest --runInBand --coverage --passWithNoTests ",
+    "check": "biome check",
+    "check:fix": "biome check --write"
   },
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Drytec/Spottly-Backend.git"
@@ -23,7 +32,7 @@
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/Drytec/Spottly-Backend/issues"
+    "url": "https://github.com/es-sai-fi/Spotly-Backend/issues"
   },
   "homepage": "https://github.com/Drytec/Spottly-Backend#readme"
 }
