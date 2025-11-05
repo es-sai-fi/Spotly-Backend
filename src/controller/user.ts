@@ -189,9 +189,13 @@ export async function updateAUser(req: Request, res: Response) {
 export async function deleteUserController(req:Request, res: Response){
   try{
     const {userId} = req.params;
-    const userDelete = await deleteUser(userId);
-    if(userDelete!){
-      return res.status(400).json({error: "Error al eliminar usuario"});
+    const validUser = await getUserById(userId);
+    if(!validUser){
+       return res.status(404).json({error: "El usuario no existe"});
+    }
+    const userDeleted = await deleteUser(userId);
+    if (!userDeleted) {
+      return res.status(400).json({ error: "No se pudo eliminar el usuario" });
     }
     return res.status(200).json({message: "Usuario eliminado correctamente"})
   }catch(error){

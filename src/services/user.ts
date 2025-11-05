@@ -65,16 +65,15 @@ export async function deleteUser(user_id:string) {
     .from("users")
     .delete()
     .eq("id",user_id)
-
+    .select();
   if (error) throw new Error(error.message);
- 
+  
+  return data && data.length > 0 ? data[0] : null;
   }
 
 
 export async function changePassword(id: string,newPassword: string){
   try{
-    const user = await getUserById(id);
- 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     const { data, error } = await supabase
       .from("users")

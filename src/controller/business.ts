@@ -4,6 +4,11 @@ import {
   createBusiness,
   getBusinessByEmail,
   getBusinessByUsername,
+  deleteBusiness,
+  editBusiness,
+  getBusinessById,
+  getBusinessByIdPassword,
+  changePassword,
 } from "../services/business";
 import { Request, Response } from "express";
 
@@ -26,6 +31,7 @@ export async function registerBusiness(req: Request, res: Response) {
           "Faltan datos necesarios: nombre, correo, nombre de usuario, categoría, contraseña",
       });
     }
+    
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (typeof email !== "string" || !emailRegex.test(email)) {
@@ -157,4 +163,65 @@ export async function loginBusiness(req: Request, res: Response) {
   } catch {
     return res.status(500).json({ error: "Server error" });
   }
+}
+
+export async function editBusinessController(req:Request,res:Response){
+  const businessId = req.params.businesId;
+  const body = req.body;
+  const toUpdate: Record<string, unknown> = {};
+
+  if (typeof body.name === "string") toUpdate.name = body.name;
+  if (typeof body.description === "string") toUpdate.description = body.description;
+  if (typeof body.email === "string") toUpdate.email = body.email;
+  if (typeof body.busi_username === "string") toUpdate.busi_username = body.busi_username;
+  if (typeof body.address === "string") toUpdate.address = body.address;
+  
+  const editedBusiness = await editBusiness(businessId, toUpdate);
+  if (!editBusiness){
+    return res.status(400).json({error:"Hubo un error editando la información"})
+  }
+  return res.status(200).json({message:"Información editada exitosamente",toUpdate})
+
+}
+
+export async function deleteBusinessController(req:Request,res:Response){
+  const businessId = req.params.businessId
+  const validBusinessId = getBusinessById(businessId)
+
+  if(!validBusinessId){
+    return res.status(404).json({error:"No existe el negocio"});
+  }
+  const businessDeleted = await deleteBusiness(businessId);
+  if(!businessDeleted){
+    return res.status(400).json({error:"No se pudo eliminar el negocio"});
+  }
+  return res.status(200).json({message:"Negocio eliminado exitosamente"})
+}
+
+export async function changePasswordController(req:Request, res:Response){
+    const businessId = req.params.businessId;
+    const {oldPassword,newPassword} = req.body;
+    const Password = await getBusinessByIdPassword(businessId);
+    
+    if(!Password){
+       return res.status(404).json({error:"Negocio no encontrado"})
+    }
+    if(oldPassword==newPassword){
+      return res.status(400).json({error:"Las contraseñas son iguales"})
+    }
+    if (!Password){
+      return res.status(400).json({error:"No se encontro el negocio"});
+    }
+    
+    const verify = await bcrypt.compare(oldPassword,Password);
+    
+    if(!verify){
+      return res.status(400).json({error: "La contraseña actual no coincide"});
+    }
+    const passwordNew = await changePassword(businessId,newPassword);
+
+    if (!passwordNew){
+      return res.status(400).json({error: "Error al cambiar la contraseña"});
+    }
+    return res.status(200).json({message : "Contraseña Actualizada exitosamente"});
 }
