@@ -40,7 +40,7 @@ export async function getBusinessByEmail(email: string) {
     .eq("email", email)
     .maybeSingle();
   if (error) throw new Error(error.message);
-  return data; // could be null if not found
+  return data; 
 }
 
 export async function getBusinessByUsername(busi_username: string) {
@@ -50,5 +50,6 @@ export async function getBusinessByUsername(busi_username: string) {
     .eq("busi_username", busi_username)
     .maybeSingle();
   if (error) throw new Error(error.message);
-  return data; // could be null if not found
+  return data; 
 }
+

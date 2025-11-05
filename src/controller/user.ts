@@ -4,19 +4,40 @@ import {
   getUserByEmail,
   getUserByUsername,
   updateUser,
+  deleteUser,
+  getUserById,
 } from "../services/user";
 import { generateToken } from "../services/auth";
 import { Request, Response } from "express";
+import { error } from "console";
 
 export async function registerUser(req: Request, res: Response) {
   try {
-    const { email, name, age, password, username, surname } = req.body;
+    const { email, name, surname,age, password, username} = req.body;
 
-    if (!email || !name || age === undefined || !password) {
+    if (!email) {
       return res.status(400).json({
-        error: "Faltan campos obligatorios: name, email, age, password",
+        error: "Falta proporcionar el Email",
       });
     }
+    else if(age === undefined){
+      return res.status(400).json({
+        error: "Falta proporcionar la edad",
+      });
+    }
+    else if (!password) {
+      return res.status(400).json({
+        error: "Falta proporcionar la contraseña",
+      });
+    }
+ 
+
+    if(!name || !surname){
+      return res.status(400).json({
+        error: "Proporcione el nombre completo",
+      });
+    }
+
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (typeof email !== "string" || !emailRegex.test(email)) {
@@ -93,7 +114,7 @@ export async function registerUser(req: Request, res: Response) {
       : null;
     return res.status(201).json(safeUser);
   } catch {
-    return res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ error: "Error del servidor" });
   }
 }
 
@@ -101,15 +122,18 @@ export async function loginUser(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password)
-      return res.status(400).json({ error: "Missing parameters for login" });
+    if (!email)
+      return res.status(400).json({ error: "El email no ha sido proporcionado" });
+    if (!password){
+      return res.status(400).json({error:"La contraseña no ha sido proporcionada"})
+    }
 
     const user = await getUserByEmail(email);
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword)
-      return res.status(400).json({ error: "Incorrect password" });
+      return res.status(400).json({ error: "Contraseña incorrecta" });
     const token = generateToken({
       id: user.id,
       email: user.email,
@@ -117,7 +141,7 @@ export async function loginUser(req: Request, res: Response) {
     });
 
     return res.status(200).json({
-      message: "Login successful",
+      message: "Login exitoso",
       token,
       user: {
         id: user.id,
@@ -129,7 +153,7 @@ export async function loginUser(req: Request, res: Response) {
       },
     });
   } catch {
-    return res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ error: "Error del servidor" });
   }
 }
 
@@ -145,14 +169,11 @@ export async function updateAUser(req: Request, res: Response) {
     if (typeof body.email === "string") toUpdate.email = body.email;
     if (typeof body.username === "string") toUpdate.username = body.username;
     if (typeof body.age === "number") toUpdate.age = body.age;
-    if (typeof body.password === "string" && body.password.length >= 8) {
-      toUpdate.password = await bcrypt.hash(body.password, 10);
-    }
 
     const updatedUser = await updateUser(userId, toUpdate);
 
     return res.status(200).json({
-      message: "Update successful",
+      message: "Usuario actualizado exitosamente",
       updatedUser,
     });
   } catch (error) {
@@ -160,7 +181,32 @@ export async function updateAUser(req: Request, res: Response) {
       console.error(error.message);
       return res.status(500).json({ error: error.message });
     }
-    console.error(error);
-    return res.status(500).json({ error: "Unexpected error occurred" });
+    return res.status(500).json({ error: "Error inesperado" });
+  }
+}
+
+export async function deleteUserController(req:Request, res: Response){
+  try{
+    const {userId} = req.params;
+    const userDelete = await deleteUser(userId);
+    if(userDelete!){
+      return res.status(400).json({error: "Error al eliminar usuario"});
+    }
+    return res.status(200).json({message: "Usuario eliminado correctamente"})
+  }catch(error){
+    return res.status(400).json(error);
+  }
+}
+
+
+export async function getUserByIdController(req: Request, res: Response) {
+  try{
+    const userId = req.params.userId;
+    const user = await getUserById(userId);
+    if(!user){
+      return res.status(400).json({error:"No existe el usuario"});
+    }
+    return res.status(200).json({message:"Usuario encontrado",user})
+  }catch(error){
   }
 }

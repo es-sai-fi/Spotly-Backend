@@ -27,7 +27,16 @@ export async function getUserByEmail(email: string) {
     .eq("email", email)
     .maybeSingle();
   if (error) throw new Error(error.message);
-  return data; // could be null if not found
+  return data; 
+}
+export async function getUserById(id: string) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data; 
 }
 
 export async function getUserByUsername(username: string) {
@@ -37,7 +46,7 @@ export async function getUserByUsername(username: string) {
     .eq("username", username)
     .maybeSingle();
   if (error) throw new Error(error.message);
-  return data; // could be null if not found
+  return data; 
 }
 
 export async function updateUser(id: string, updates: Record<string, unknown>) {
@@ -50,3 +59,15 @@ export async function updateUser(id: string, updates: Record<string, unknown>) {
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function deleteUser(user_id:string) {
+  const {data , error} = await supabase
+    .from("users")
+    .delete()
+    .eq("id",user_id)
+
+  if (error) throw new Error(error.message);
+ 
+  }
+
+
