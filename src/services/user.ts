@@ -71,3 +71,19 @@ export async function deleteUser(user_id:string) {
   }
 
 
+export async function changePassword(id: string,newPassword: string){
+  try{
+    const user = await getUserById(id);
+ 
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const { data, error } = await supabase
+      .from("users")
+      .update({ password: hashedPassword })
+      .eq("id", id)
+      .select();
+    if (error) throw new Error(error.message);
+    return data[0];}
+  catch(err){
+    throw new Error((err as Error).message);
+  }
+}

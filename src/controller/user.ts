@@ -5,11 +5,12 @@ import {
   getUserByUsername,
   updateUser,
   deleteUser,
+  changePassword,
   getUserById,
 } from "../services/user";
 import { generateToken } from "../services/auth";
 import { Request, Response } from "express";
-import { error } from "console";
+
 
 export async function registerUser(req: Request, res: Response) {
   try {
@@ -197,7 +198,30 @@ export async function deleteUserController(req:Request, res: Response){
     return res.status(400).json(error);
   }
 }
+export async function changePasswordController(req:Request, res:Response){
+    const userId = req.params.userId;
+    const {oldPassword,newPassword} = req.body;
+    const Password = await getUserById(userId);
+    if(oldPassword==newPassword){
+      return res.status(400).json({error:"Las contraseñas son iguales"})
+    }
+    if (!Password){
+      return res.status(400).json({error:"No se encontro el usuario"});
+    }
+    const actPasword = Password.password;
+    
+    const verify = await bcrypt.compare(oldPassword,actPasword);
+    
+    if(!verify){
+      return res.status(400).json({error: "La contraseña actual no coincide"});
+    }
+    const passwordNew = await changePassword(userId,newPassword);
 
+    if (!passwordNew){
+      return res.status(400).json({error: "Error al cambiar la contraseña"});
+    }
+    return res.status(200).json({message : "Contraseña Actualizada exitosamente"});
+}
 
 export async function getUserByIdController(req: Request, res: Response) {
   try{
