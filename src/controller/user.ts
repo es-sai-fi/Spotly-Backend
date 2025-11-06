@@ -8,37 +8,33 @@ import {
   changePassword,
   getUserById,
 } from "../services/user";
+import { addUsername } from "../services/usernames";
 import { generateToken } from "../services/auth";
 import { Request, Response } from "express";
 
-
 export async function registerUser(req: Request, res: Response) {
   try {
-    const { email, name, surname,age, password, username} = req.body;
+    const { email, name, surname, age, password, username } = req.body;
 
     if (!email) {
       return res.status(400).json({
         error: "Falta proporcionar el Email",
       });
-    }
-    else if(age === undefined){
+    } else if (age === undefined) {
       return res.status(400).json({
         error: "Falta proporcionar la edad",
       });
-    }
-    else if (!password) {
+    } else if (!password) {
       return res.status(400).json({
         error: "Falta proporcionar la contraseña",
       });
     }
- 
 
-    if(!name || !surname){
+    if (!name || !surname) {
       return res.status(400).json({
         error: "Proporcione el nombre completo",
       });
     }
-
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (typeof email !== "string" || !emailRegex.test(email)) {
@@ -96,10 +92,12 @@ export async function registerUser(req: Request, res: Response) {
         .json({ error: "El email o nombre de usuario ya está registrado" });
     }
 
+    const usernameData = await addUsername(username);
+
     const created = await createUser(
+      usernameData.id,
       email,
       name,
-      username,
       surname,
       ageNum,
       passwordStr,
@@ -108,14 +106,18 @@ export async function registerUser(req: Request, res: Response) {
       ? {
           id: created.id,
           email: created.email,
-          username: created.username,
+          username_id: created.username_id,
           name: created.name,
           age: created.age,
         }
       : null;
     return res.status(201).json(safeUser);
-  } catch {
-    return res.status(500).json({ error: "Error del servidor" });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
 }
 
@@ -124,9 +126,13 @@ export async function loginUser(req: Request, res: Response) {
     const { email, password } = req.body;
 
     if (!email)
-      return res.status(400).json({ error: "El email no ha sido proporcionado" });
-    if (!password){
-      return res.status(400).json({error:"La contraseña no ha sido proporcionada"})
+      return res
+        .status(400)
+        .json({ error: "El email no ha sido proporcionado" });
+    if (!password) {
+      return res
+        .status(400)
+        .json({ error: "La contraseña no ha sido proporcionada" });
     }
 
     const user = await getUserByEmail(email);
@@ -138,7 +144,6 @@ export async function loginUser(req: Request, res: Response) {
     const token = generateToken({
       id: user.id,
       email: user.email,
-      username: user.username,
     });
 
     return res.status(200).json({
@@ -146,15 +151,19 @@ export async function loginUser(req: Request, res: Response) {
       token,
       user: {
         id: user.id,
-        email: user.email,
-        username: user.username,
+        username_id: user.username_id,
         name: user.name,
+        email: user.email,
         surname: user.surname,
         age: user.age,
       },
     });
-  } catch {
-    return res.status(500).json({ error: "Error del servidor" });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
 }
 
@@ -168,7 +177,6 @@ export async function updateAUser(req: Request, res: Response) {
     if (typeof body.name === "string") toUpdate.name = body.name;
     if (typeof body.surname === "string") toUpdate.surname = body.surname;
     if (typeof body.email === "string") toUpdate.email = body.email;
-    if (typeof body.username === "string") toUpdate.username = body.username;
     if (typeof body.age === "number") toUpdate.age = body.age;
 
     const updatedUser = await updateUser(userId, toUpdate);
@@ -186,55 +194,58 @@ export async function updateAUser(req: Request, res: Response) {
   }
 }
 
-export async function deleteUserController(req:Request, res: Response){
-  try{
-    const {userId} = req.params;
+export async function deleteUserController(req: Request, res: Response) {
+  try {
+    const { userId } = req.params;
     const validUser = await getUserById(userId);
-    if(!validUser){
-       return res.status(404).json({error: "El usuario no existe"});
+    if (!validUser) {
+      return res.status(404).json({ error: "El usuario no existe" });
     }
     const userDeleted = await deleteUser(userId);
     if (!userDeleted) {
       return res.status(400).json({ error: "No se pudo eliminar el usuario" });
     }
-    return res.status(200).json({message: "Usuario eliminado correctamente"})
-  }catch(error){
+    return res.status(200).json({ message: "Usuario eliminado correctamente" });
+  } catch (error) {
     return res.status(400).json(error);
   }
 }
-export async function changePasswordController(req:Request, res:Response){
-    const userId = req.params.userId;
-    const {oldPassword,newPassword} = req.body;
-    const Password = await getUserById(userId);
-    if(oldPassword==newPassword){
-      return res.status(400).json({error:"Las contraseñas son iguales"})
-    }
-    if (!Password){
-      return res.status(400).json({error:"No se encontro el usuario"});
-    }
-    const actPasword = Password.password;
-    
-    const verify = await bcrypt.compare(oldPassword,actPasword);
-    
-    if(!verify){
-      return res.status(400).json({error: "La contraseña actual no coincide"});
-    }
-    const passwordNew = await changePassword(userId,newPassword);
+export async function changePasswordController(req: Request, res: Response) {
+  const userId = req.params.userId;
+  const { oldPassword, newPassword } = req.body;
+  const Password = await getUserById(userId);
+  if (oldPassword == newPassword) {
+    return res.status(400).json({ error: "Las contraseñas son iguales" });
+  }
+  if (!Password) {
+    return res.status(400).json({ error: "No se encontro el usuario" });
+  }
+  const actPasword = Password.password;
 
-    if (!passwordNew){
-      return res.status(400).json({error: "Error al cambiar la contraseña"});
-    }
-    return res.status(200).json({message : "Contraseña Actualizada exitosamente"});
+  const verify = await bcrypt.compare(oldPassword, actPasword);
+
+  if (!verify) {
+    return res.status(400).json({ error: "La contraseña actual no coincide" });
+  }
+  const passwordNew = await changePassword(userId, newPassword);
+
+  if (!passwordNew) {
+    return res.status(400).json({ error: "Error al cambiar la contraseña" });
+  }
+  return res
+    .status(200)
+    .json({ message: "Contraseña Actualizada exitosamente" });
 }
 
 export async function getUserByIdController(req: Request, res: Response) {
-  try{
+  try {
     const userId = req.params.userId;
     const user = await getUserById(userId);
-    if(!user){
-      return res.status(400).json({error:"No existe el usuario"});
+    if (!user) {
+      return res.status(400).json({ error: "No existe el usuario" });
     }
-    return res.status(200).json({message:"Usuario encontrado",user})
-  }catch(error){
+    return res.status(200).json({ message: "Usuario encontrado", user });
+  } catch (error) {
+    return res.status(400).json(error);
   }
 }

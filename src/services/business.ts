@@ -2,9 +2,9 @@ import { supabase } from "../config/database";
 import bcrypt from "bcrypt";
 
 export async function createBusiness(
+  username_id: string,
   email: string,
   name: string,
-  busi_username: string,
   category: string,
   rating: number,
   description: string,
@@ -17,9 +17,9 @@ export async function createBusiness(
     .from("businesses")
     .insert([
       {
+        username_id,
         email,
         name,
-        busi_username,
         category,
         rating,
         description,
@@ -37,20 +37,26 @@ export async function getBusinessByEmail(email: string) {
   const { data, error } = await supabase
     .from("businesses")
     .select("*")
-    .eq("email", email)
-    .maybeSingle();
+    .eq("email", email);
   if (error) throw new Error(error.message);
-  return data; 
+  return data[0];
 }
 
-export async function getBusinessByUsername(busi_username: string) {
-  const { data, error } = await supabase
+export async function getBusinessByUsername(username: string) {
+  const { data: usernameData, error: usernameError } = await supabase
+    .from("usernames")
+    .select("*")
+    .eq("username", username);
+  if (usernameError) throw new Error(usernameError.message);
+  if (!usernameData || usernameData.length === 0) return null;
+  const username_id = usernameData[0].id;
+
+  const { data: businessData, error: businessError } = await supabase
     .from("businesses")
     .select("*")
-    .eq("busi_username", busi_username)
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  return data; 
+    .eq("username_id", username_id);
+  if (businessError) throw new Error(businessError.message);
+  return businessData;
 }
 export async function getBusinessById(id: string) {
   const { data, error } = await supabase
@@ -60,9 +66,11 @@ export async function getBusinessById(id: string) {
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (data) delete data.password;
-  return data; 
+  return data;
 }
-export async function getBusinessByIdPassword(id: string) : Promise<string | null>{
+export async function getBusinessByIdPassword(
+  id: string,
+): Promise<string | null> {
   const { data, error } = await supabase
     .from("businesses")
     .select("password")
@@ -72,31 +80,47 @@ export async function getBusinessByIdPassword(id: string) : Promise<string | nul
   return data ? data.password : null;
 }
 
-
-export async function editBusiness(business_id:string,updates: Record<string,unknown>){
-  const {data , error} = await supabase
-  .from("businesses")
-  .update(updates)
-  .eq("id",business_id)
-  .select()
-  .maybeSingle();
-  if(error){
+export async function editBusiness(
+  business_id: string,
+  updates: Record<string, unknown>,
+) {
+  const { data, error } = await supabase
+    .from("businesses")
+    .update(updates)
+    .eq("id", business_id)
+    .select()
+    .maybeSingle();
+  if (error) {
     throw new Error(error.message);
   }
   return data;
 }
-export async function deleteBusiness(business_id:string){
-  const {data , error} = await supabase
-  .from("businesses")
-  .delete()
-  .eq("id",business_id)
-  .select();
-  if (error) { throw new Error(error.message)}
+export async function deleteBusiness(business_id: string) {
+  const { data, error } = await supabase
+    .from("businesses")
+    .delete()
+    .eq("id", business_id)
+    .select();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data || data.length === 0) return null;
+
+  const deletedBusiness = data[0];
+
+  if (deletedBusiness.username_id) {
+    await supabase
+      .from("usernames")
+      .delete()
+      .eq("id", deletedBusiness.username_id);
+  }
   return data && data.length > 0 ? data[0] : null;
 }
 
-export async function changePassword(id: string,newPassword: string){
-  try{
+export async function changePassword(id: string, newPassword: string) {
+  try {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     const { data, error } = await supabase
       .from("businesses")
@@ -104,8 +128,8 @@ export async function changePassword(id: string,newPassword: string){
       .eq("id", id)
       .select();
     if (error) throw new Error(error.message);
-    return data[0];}
-  catch(err){
+    return data[0];
+  } catch (err) {
     throw new Error((err as Error).message);
   }
 }
