@@ -1,3 +1,4 @@
+
 import type { Config } from 'jest';
 
 const config: Config = {
@@ -8,6 +9,7 @@ const config: Config = {
   testMatch: [
     "./tests/**/*.ts",
   ]
+
 };
 
 export default config;

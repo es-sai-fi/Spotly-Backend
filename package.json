@@ -4,16 +4,22 @@
   "description": "A web application for connecting businesses and potential clients.",
   "main": "index.js",
   "devDependencies": {
-    "@types/node": "^24.9.1",
+    "@types/bcrypt": "^6.0.0",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.5",
+    "@types/helmet": "^0.0.48",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.10.0",
     "biome": "^0.3.3",
     "jest": "^30.2.0",
     "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "dev": "ts-node src/app.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
-    "start": "node build/app.js",
+    "start": "node dist/server.js",
     "lint": "biome lint",
     "lint:fix": "biome lint --write",
     "format": "biome format",
@@ -34,5 +40,13 @@
   "bugs": {
     "url": "https://github.com/es-sai-fi/Spotly-Backend/issues"
   },
-  "homepage": "https://github.com/Drytec/Spottly-Backend#readme"
+  "homepage": "https://github.com/Drytec/Spottly-Backend#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.79.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2"
+  }
 }
