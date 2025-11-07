@@ -4,7 +4,8 @@ import helmet from "helmet";
 import userRoutes from "./routes/user";
 import businessRoutes from "./routes/business";
 import usernameRoutes from "./routes/username";
-import reviewsRoutes from "./routes/reviews"
+import reviewsRoutes from "./routes/reviews";
+import postsRoutes from "./routes/post";
 dotenv.config();
 
 const app = express();
@@ -18,7 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/users", userRoutes);
 app.use("/api/businesses", businessRoutes);
 app.use("/api/username", usernameRoutes);
-app.use("/api/reviews",reviewsRoutes);
+app.use("/api/reviews", reviewsRoutes);
+app.use("/api/posts", postsRoutes);
 app.get("/", (_req: Request, res: Response) => {
   res.send("Backend API is running 🚀");
 });
