@@ -6,7 +6,6 @@ export async function createBusiness(
   email: string,
   name: string,
   category: string,
-  rating: number,
   description: string,
   address: string,
   password: string,
@@ -21,7 +20,6 @@ export async function createBusiness(
         email,
         name,
         category,
-        rating,
         description,
         address,
         password: hashedPassword,
@@ -132,4 +130,16 @@ export async function changePassword(id: string, newPassword: string) {
   } catch (err) {
     throw new Error((err as Error).message);
   }
+}
+
+export async function businessRatingById(id: string) {
+  const { data, error } = await supabase
+    .from("business_rating")
+    .select()
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+
+  return data;
 }

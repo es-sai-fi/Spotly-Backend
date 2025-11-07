@@ -8,6 +8,7 @@ import {
   editBusiness,
   getBusinessById,
   getBusinessByIdPassword,
+  businessRatingById,
   changePassword,
 } from "../services/business";
 import { addUsername } from "../services/usernames";
@@ -15,16 +16,8 @@ import { Request, Response } from "express";
 
 export async function registerBusiness(req: Request, res: Response) {
   try {
-    const {
-      email,
-      name,
-      username,
-      category,
-      rating,
-      description,
-      address,
-      password,
-    } = req.body;
+    const { email, name, username, category, description, address, password } =
+      req.body;
 
     if (!email || !name || !username || !category || !password) {
       return res.status(400).json({
@@ -99,7 +92,6 @@ export async function registerBusiness(req: Request, res: Response) {
       email,
       name,
       category,
-      rating,
       description,
       address,
       passwordStr,
@@ -180,8 +172,6 @@ export async function editBusinessController(req: Request, res: Response) {
   if (typeof body.description === "string")
     toUpdate.description = body.description;
   if (typeof body.email === "string") toUpdate.email = body.email;
-  if (typeof body.busi_username === "string")
-    toUpdate.busi_username = body.busi_username;
   if (typeof body.address === "string") toUpdate.address = body.address;
 
   const editedBusiness = await editBusiness(businessId, toUpdate);
@@ -237,4 +227,24 @@ export async function changePasswordController(req: Request, res: Response) {
   return res
     .status(200)
     .json({ message: "Contraseña Actualizada exitosamente" });
+}
+
+export async function getBusinessRatingById(req: Request, res: Response) {
+  const businessId = req.params.businessId;
+  const business = await getBusinessById(businessId);
+
+  if (!businessId) {
+    return res.status(404).json({ error: "El id no fue proporcionado." });
+  }
+
+  if (!business) {
+    return res.status(404).json({ error: "Negocio no encontrado" });
+  }
+
+  const ratingData = await businessRatingById(businessId);
+  if (!ratingData) {
+    return res.status(400).json({ error: "Error al mostrar el rating" });
+  }
+
+  return res.status(200).json(ratingData);
 }
