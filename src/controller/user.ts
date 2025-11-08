@@ -104,12 +104,12 @@ export async function registerUser(req: Request, res: Response) {
     );
     const safeUser = created
       ? {
-          id: created.id,
-          email: created.email,
-          username_id: created.username_id,
-          name: created.name,
-          age: created.age,
-        }
+        id: created.id,
+        email: created.email,
+        username_id: created.username_id,
+        name: created.name,
+        age: created.age,
+      }
       : null;
     return res.status(201).json(safeUser);
   } catch (error) {
@@ -210,31 +210,45 @@ export async function deleteUserController(req: Request, res: Response) {
     return res.status(400).json(error);
   }
 }
+
 export async function changePasswordController(req: Request, res: Response) {
-  const userId = req.params.userId;
-  const { oldPassword, newPassword } = req.body;
-  const Password = await getUserById(userId);
-  if (oldPassword == newPassword) {
-    return res.status(400).json({ error: "Las contraseñas son iguales" });
-  }
-  if (!Password) {
-    return res.status(400).json({ error: "No se encontro el usuario" });
-  }
-  const actPasword = Password.password;
+  try {
+    const userId = req.params.userId;
+    const { oldPassword, newPassword } = req.body;
+    const Password = await getUserById(userId);
 
-  const verify = await bcrypt.compare(oldPassword, actPasword);
+    if (oldPassword == newPassword) {
+      return res.status(400).json({ error: "Las contraseñas son iguales" });
+    }
+    if (!Password) {
+      return res.status(400).json({ error: "No se encontro el usuario" });
+    }
 
-  if (!verify) {
-    return res.status(400).json({ error: "La contraseña actual no coincide" });
-  }
-  const passwordNew = await changePassword(userId, newPassword);
+    const actPasword = Password.password;
+    const verify = await bcrypt.compare(oldPassword, actPasword);
 
-  if (!passwordNew) {
-    return res.status(400).json({ error: "Error al cambiar la contraseña" });
+    if (!verify) {
+      return res
+        .status(400)
+        .json({ error: "La contraseña actual no coincide" });
+    }
+
+    const passwordNew = await changePassword(userId, newPassword);
+
+    if (!passwordNew) {
+      return res.status(400).json({ error: "Error al cambiar la contraseña" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Contraseña Actualizada exitosamente" });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
-  return res
-    .status(200)
-    .json({ message: "Contraseña Actualizada exitosamente" });
 }
 
 export async function getUserByIdController(req: Request, res: Response) {
