@@ -28,8 +28,8 @@
     "lint:fix": "biome lint --write",
     "format": "biome format",
     "format:fix": "biome format --write",
-    "test": "jest",
-    "test:coverage": "jest --runInBand --coverage --passWithNoTests ",
+    "test": "jest --runInBand --passWithNoTests",
+    "test:coverage": "jest --runInBand --coverage --passWithNoTests",
     "check": "biome check",
     "check:fix": "biome check --write",
     "resetDb": "ts-node ./tests/utils/resetDatabase.ts"
