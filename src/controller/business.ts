@@ -33,7 +33,7 @@ export async function registerBusiness(req: Request, res: Response) {
       });
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     if (typeof email !== "string" || !emailRegex.test(email)) {
       return res.status(400).json({ error: "Email inválido" });
     }
@@ -63,11 +63,15 @@ export async function registerBusiness(req: Request, res: Response) {
         .json({ error: "La contraseña debe tener al menos 8 caracteres" });
     }
 
-    if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(passwordStr)) {
+    const hasLetter = /[a-zA-Z]/.test(passwordStr);
+    const hasNumber = /\d/.test(passwordStr);
+
+    if (!hasLetter || !hasNumber) {
       return res.status(400).json({
         error: "La contraseña debe contener al menos una letra y un número",
       });
     }
+
     const existingEmail = await getBusinessByEmail(email);
     const existingUsername = await getBusinessByUsername(username);
     if (existingEmail || existingUsername) {
@@ -90,14 +94,14 @@ export async function registerBusiness(req: Request, res: Response) {
     );
     const safeUser = created
       ? {
-          id: created.id,
-          name: created.name,
-          username_id: created.username_id,
-          email: created.email,
-          category: created.category,
-          description: created.description,
-          address: created.address,
-        }
+        id: created.id,
+        name: created.name,
+        username_id: created.username_id,
+        email: created.email,
+        category: created.category,
+        description: created.description,
+        address: created.address,
+      }
       : null;
     return res.status(201).json(safeUser);
   } catch (error) {
