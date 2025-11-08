@@ -34,12 +34,9 @@ export async function registerBusiness(req: Request, res: Response) {
       });
     }
 
-
-
     if (!validator.isEmail(email)) {
       return res.status(400).json({ error: "Email inválido" });
     }
-
 
     if (typeof name !== "string" || name.trim().length === 0) {
       return res.status(400).json({ error: "Nombre inválido" });

@@ -38,6 +38,11 @@ jobs:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     needs: test
+    env:
+      PORT: ${{ secrets.PORT }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     if: |
       github.ref == 'refs/heads/staging' || 
       (github.event_name == 'pull_request' && github.base_ref == 'staging')
