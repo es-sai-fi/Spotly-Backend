@@ -1,7 +1,7 @@
 import request from "supertest";
-import app from "../src/app";
-import { supabase } from "../src/config/database";
-import * as userService from "../src/services/user";
+import app from "../../src/app";
+import { supabase } from "../../src/config/database";
+import * as userService from "../../src/services/user";
 import bcrypt from "bcrypt";
 
 describe("Integration - changePasswordController", () => {

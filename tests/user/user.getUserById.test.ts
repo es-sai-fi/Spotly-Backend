@@ -1,7 +1,7 @@
 import request from "supertest";
-import app from "../src/app";
-import { supabase } from "../src/config/database";
-import * as userService from "../src/services/user";
+import app from "../../src/app";
+import { supabase } from "../../src/config/database";
+import * as userService from "../../src/services/user";
 
 describe("Integration - getUserByIdController", () => {
   const registerEndpoint = "/api/users/register";
@@ -12,6 +12,7 @@ describe("Integration - getUserByIdController", () => {
   let userId: string;
   let usernameId: string;
 
+  // Register a user before running tests
   beforeAll(async () => {
     const res = await request(app).post(registerEndpoint).send({
       email: testEmail,
