@@ -114,7 +114,6 @@ export async function registerUser(req: Request, res: Response) {
     return res.status(201).json(safeUser);
   } catch (error) {
     if (error instanceof Error) {
-      console.error(error.message);
       return res.status(500).json({ error: error.message });
     }
     return res.status(500).json({ error: "Error inesperado" });
@@ -160,7 +159,6 @@ export async function loginUser(req: Request, res: Response) {
     });
   } catch (error) {
     if (error instanceof Error) {
-      console.error(error.message);
       return res.status(500).json({ error: error.message });
     }
     return res.status(500).json({ error: "Error inesperado" });
@@ -187,7 +185,6 @@ export async function updateAUser(req: Request, res: Response) {
     });
   } catch (error) {
     if (error instanceof Error) {
-      console.error(error.message);
       return res.status(500).json({ error: error.message });
     }
     return res.status(500).json({ error: "Error inesperado" });
@@ -207,7 +204,10 @@ export async function deleteUserController(req: Request, res: Response) {
     }
     return res.status(200).json({ message: "Usuario eliminado correctamente" });
   } catch (error) {
-    return res.status(400).json(error);
+    if (error instanceof Error) {
+      return res.status(400).json({ error: error.message });
+    }
+    return res.status(400).json({ error: "Error inesperado" });
   }
 }
 
@@ -244,7 +244,6 @@ export async function changePasswordController(req: Request, res: Response) {
       .json({ message: "Contraseña Actualizada exitosamente" });
   } catch (error) {
     if (error instanceof Error) {
-      console.error(error.message);
       return res.status(500).json({ error: error.message });
     }
     return res.status(500).json({ error: "Error inesperado" });
@@ -260,6 +259,9 @@ export async function getUserByIdController(req: Request, res: Response) {
     }
     return res.status(200).json({ message: "Usuario encontrado", user });
   } catch (error) {
-    return res.status(400).json(error);
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
 }
