@@ -201,7 +201,7 @@ export async function changePasswordController(req: Request, res: Response) {
   if (!Password) {
     return res.status(404).json({ error: "Negocio no encontrado" });
   }
-  if (oldPassword == newPassword) {
+  if (oldPassword === newPassword) {
     return res.status(400).json({ error: "Las contraseñas son iguales" });
   }
 
