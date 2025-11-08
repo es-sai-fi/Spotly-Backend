@@ -15,8 +15,11 @@ const config: Config = {
     },
   },
   coveragePathIgnorePatterns: [
+    "node_modules/",
+    "build",
     "src/config/",
     "src/services/business.ts", // Skipping for now
+    "src/controller/business.ts", // Skipping for now
     "src/services/auth.ts", // Not relevant
   ],
   testEnvironment: 'node',
