@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = process.env.JWT_SECRET || "notFound";
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable must be set");
+}
+const SECRET_KEY = process.env.JWT_SECRET;
 
 export function generateToken(payload: object): string {
   return jwt.sign(payload, SECRET_KEY, {
