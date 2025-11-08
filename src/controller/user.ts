@@ -202,11 +202,11 @@ export async function changePasswordController(req: Request, res: Response) {
     const { oldPassword, newPassword } = req.body;
     const Password = await getUserById(userId);
 
-    if (oldPassword === newPassword) {
-      return res.status(400).json({ error: "Las contraseñas son iguales" });
-    }
     if (!Password) {
       return res.status(400).json({ error: "No se encontró el usuario" });
+    }
+    if (oldPassword === newPassword) {
+      return res.status(400).json({ error: "Las contraseñas son iguales" });
     }
 
     const actPasword = Password.password;
