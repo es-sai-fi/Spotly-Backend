@@ -91,3 +91,21 @@ export async function getPostById(postId: string) {
 
   return data;
 }
+export async function getAllPostBusiness(businessId:string) {
+  const { data, error } = await supabase
+  .from("posts")
+  .select("*")
+  .eq("business_id",businessId)
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
+export async function getAllPost() {
+  const { data, error } = await supabase
+  .from("posts")
+  .select("*")
+  if (error) throw new Error(error.message);
+
+  return data;
+}

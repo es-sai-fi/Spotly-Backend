@@ -1,5 +1,12 @@
 import { Request, Response } from "express";
-import { addPost, deletePost, getPostById } from "../services/post";
+import { 
+  addPost, 
+  deletePost, 
+  getPostById,
+  getAllPost,
+  getAllPostBusiness,
+ } from "../services/post";
+import { getBusinessById } from "../services/business";
 
 export async function createPostController(req: Request, res: Response) {
   try {
@@ -19,9 +26,9 @@ export async function createPostController(req: Request, res: Response) {
     }
     return res
       .status(200)
-      .json({ message: "Post creado exitosamente", postData });
-  } catch (error) {
-    return res.status(400).json({ error: "No se pudo crear el post" });
+      .json({ message: "Publicacion creada exitosamente", postData });
+  } catch (err:any) {
+    return res.status(400).json({ error:err.message  });
   }
 }
 
@@ -31,13 +38,39 @@ export async function deletePostController(req: Request, res: Response) {
 
     const validPost = await getPostById(postId);
     if (!validPost) {
-      return res.status(404).json({ error: "Post no encontrado" });
+      return res.status(404).json({ error: "Publicacion no encontrada" });
     }
 
     const result = deletePost(postId);
 
     return res.status(200).json(result);
   } catch (error) {
-    return res.status(400).json({ error: "Error al eliminar post" });
+    return res.status(400).json({ error: "Error al eliminar la publicacion" });
+  }
+}
+
+export async function getAllPostBusinessController(req: Request, res: Response) {
+  try{
+    const business_id = req.body;
+    const validBusiness = await getBusinessById(business_id);
+    if(!validBusiness){
+      return res.status(404).json({message:"No existe el negocio"});
+    }
+    const postBusiness = await getAllPostBusiness(business_id);
+    if(!postBusiness){
+      return res.status(400).json({error:"Error al obtener publicaciones"})
+    }
+    return res.status(200).json({message:"Publicaciones encontradas",data:postBusiness})
+  }catch(err:any){
+     return res.status(400).json({ error:"Error al obtener Post" });
+    }
+}
+export async function getAllPostController(req: Request, res: Response) {
+  try{ 
+      const allPost = await getAllPost();
+      return res.status(200).json({data:allPost});
+}
+  catch (err:any) {
+    return res.status(400).json({ error:"Error al obtener publicaciones" });
   }
 }
