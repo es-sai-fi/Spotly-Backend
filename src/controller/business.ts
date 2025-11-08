@@ -156,7 +156,7 @@ export async function loginBusiness(req: Request, res: Response) {
 }
 
 export async function editBusinessController(req: Request, res: Response) {
-  const businessId = req.params.businesId;
+  const businessId = req.params.businessId;
   const body = req.body;
   const toUpdate: Record<string, unknown> = {};
 
