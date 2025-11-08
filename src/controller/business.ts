@@ -204,12 +204,10 @@ export async function changePasswordController(req: Request, res: Response) {
   if (oldPassword == newPassword) {
     return res.status(400).json({ error: "Las contraseñas son iguales" });
   }
-  if (!Password) {
-    return res.status(400).json({ error: "No se encontró el negocio" });
-  }
+
+
 
   const verify = await bcrypt.compare(oldPassword, Password);
-
   if (!verify) {
     return res.status(400).json({ error: "La contraseña actual no coincide" });
   }
