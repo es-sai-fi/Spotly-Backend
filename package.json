@@ -28,6 +28,7 @@
     "lint:fix": "biome lint --write",
     "format": "biome format",
     "format:fix": "biome format --write",
+    "type-check": "tsc --noEmit",
     "test": "jest --runInBand --passWithNoTests",
     "test:coverage": "jest --runInBand --coverage --passWithNoTests",
     "check": "biome check",
