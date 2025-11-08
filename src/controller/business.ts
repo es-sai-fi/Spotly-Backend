@@ -181,7 +181,7 @@ export async function editBusinessController(req: Request, res: Response) {
 
 export async function deleteBusinessController(req: Request, res: Response) {
   const businessId = req.params.businessId;
-  const validBusinessId = getBusinessById(businessId);
+  const validBusinessId = await getBusinessById(businessId);
 
   if (!validBusinessId) {
     return res.status(404).json({ error: "No existe el negocio" });
