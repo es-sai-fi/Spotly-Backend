@@ -1,16 +1,41 @@
 import { supabase } from "../../src/config/database";
 
 export async function resetDatabase() {
-  await supabase.from("usernames").delete().neq("id", "");
-  await supabase.from("users").delete().neq("id", "");
-  await supabase.from("posts").delete().neq("id", "");
-  await supabase.from("business").delete().neq("id", "");
-  await supabase.from("comments").delete().neq("id", "");
-  await supabase.from("user_business").delete().neq("id", "");
-  await supabase.from("user_post").delete().neq("id", "");
-  await supabase.from("user_reviews").delete().neq("id", "");
+  console.log("Resetting database...\n");
 
-  console.log("Database reset successfully");
+  const tables = [
+    "comments",
+    "user_post",
+    "favorites",
+    "reviews",
+    "posts",
+    "businesses",
+    "users",
+    "usernames",
+  ];
+
+  for (const table of tables) {
+    try {
+      const filterColumn = ["user_post", "favorites"].includes(table)
+        ? "user_id" : "id";
+
+      const { error, count } = await supabase
+        .from(table)
+        .delete()
+        .not(filterColumn, "is", null)
+        .select("*");
+
+      if (error) {
+        console.error(`Error deleting from ${table}: ${error.message}`);
+      } else {
+        console.log(`Cleared ${table} (${count ?? 0} rows deleted)`);
+      }
+    } catch (err) {
+      console.error(`Unexpected error in ${table}:`, err);
+    }
+  }
+
+  console.log("\nDatabase reset completed successfully");
 }
 
 if (require.main === module) {
