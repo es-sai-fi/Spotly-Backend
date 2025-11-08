@@ -63,22 +63,6 @@ export async function registerBusiness(req: Request, res: Response) {
         .json({ error: "La contraseña debe tener al menos 8 caracteres" });
     }
 
-    const forbiddenPatterns = [
-      /(\bSELECT\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b|\bDROP\b|\bCREATE\b)/i, // SQL keywords
-      /(\bUNION\b|\bOR\b.*=.*\b|\bAND\b.*=.*\b)/i, // SQL injection patterns
-      /['"`;\\]/g,
-      /^\s+$/,
-    ];
-
-    const hasForbiddenPattern = forbiddenPatterns.some((pattern) =>
-      pattern.test(passwordStr),
-    );
-    if (hasForbiddenPattern) {
-      return res.status(400).json({
-        error: "La contraseña contiene caracteres o patrones no permitidos",
-      });
-    }
-
     if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(passwordStr)) {
       return res.status(400).json({
         error: "La contraseña debe contener al menos una letra y un número",
