@@ -11,6 +11,7 @@ import {
 import { addUsername } from "../services/usernames";
 import { generateToken } from "../services/auth";
 import { Request, Response } from "express";
+import validator from "validator";
 
 export async function registerUser(req: Request, res: Response) {
   try {
@@ -36,8 +37,7 @@ export async function registerUser(req: Request, res: Response) {
       });
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    if (typeof email !== "string" || !emailRegex.test(email)) {
+    if (!validator.isEmail(email)) {
       return res.status(400).json({ error: "Email inválido" });
     }
 
