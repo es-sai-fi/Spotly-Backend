@@ -19,7 +19,7 @@ export async function resetDatabase() {
       const filterColumn = ["user_post", "favorites"].includes(table)
         ? "user_id" : "id";
 
-      const { error, count } = await supabase
+      const { error } = await supabase
         .from(table)
         .delete()
         .not(filterColumn, "is", null)
@@ -28,7 +28,7 @@ export async function resetDatabase() {
       if (error) {
         console.error(`Error deleting from ${table}: ${error.message}`);
       } else {
-        console.log(`Cleared ${table} (${count ?? 0} rows deleted)`);
+        console.log(`Cleared ${table}`);
       }
     } catch (err) {
       console.error(`Unexpected error in ${table}:`, err);
