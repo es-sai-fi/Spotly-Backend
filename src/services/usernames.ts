@@ -17,8 +17,10 @@ export async function getUsernamebyId(username_id: string) {
     .from("usernames")
     .select("*")
     .eq("id", username_id)
-    .single();
+    .maybeSingle();
+
   if (error) throw new Error(error.message);
+
   return data;
 }
 
@@ -27,7 +29,9 @@ export async function updateUsername(username_id: string, username: string) {
     .from("usernames")
     .update([{ username: username }])
     .eq("id", username_id)
-    .select();
+    .select()
+    .maybeSingle();
+
   if (error) throw new Error(error.message);
 
   return data;
