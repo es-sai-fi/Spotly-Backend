@@ -11,7 +11,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.10.0",
     "@types/supertest": "^6.0.3",
-    "biome": "^0.3.3",
+    "biome": "^0.2.2",
     "jest": "^30.2.0",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.5",
