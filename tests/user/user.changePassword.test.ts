@@ -45,7 +45,7 @@ describe("Integration - changePasswordController", () => {
       .send({ oldPassword: testPassword, newPassword });
 
     expect(res.status).toBe(400);
-    expect(res.body.error).toBe("No se encontro el usuario");
+    expect(res.body.error).toBe("No se encontró el usuario");
 
     spy.mockRestore();
   });
