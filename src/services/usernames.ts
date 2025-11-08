@@ -27,7 +27,7 @@ export async function getUsernamebyId(username_id: string) {
 export async function updateUsername(username_id: string, username: string) {
   const { data, error } = await supabase
     .from("usernames")
-    .update([{ username: username }])
+    .update({ username: username })
     .eq("id", username_id)
     .select()
     .maybeSingle();
