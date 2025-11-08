@@ -57,4 +57,4 @@ jobs:
         uses: amondnet/vercel-action@v20
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-args: "--prod --yes --env NEXT_PUBLIC_ENV=staging"
+          vercel-args: "--prod --yes --env NODE_ENV=staging"
