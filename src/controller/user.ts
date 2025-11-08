@@ -221,7 +221,7 @@ export async function changePasswordController(req: Request, res: Response) {
       return res.status(400).json({ error: "Las contraseñas son iguales" });
     }
     if (!Password) {
-      return res.status(400).json({ error: "No se encontro el usuario" });
+      return res.status(400).json({ error: "No se encontró el usuario" });
     }
 
     const actPasword = Password.password;
