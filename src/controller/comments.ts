@@ -7,7 +7,7 @@ import {
   deleteComment,
 } from "../services/comments";
 import { getUserById } from "../services/user";
-import { getPostById } from "../services/post"; 
+import { getPostById } from "../services/post";
 
 
 export async function getCommentsByPostController(req: Request, res: Response) {
@@ -27,21 +27,25 @@ export async function getCommentsByPostController(req: Request, res: Response) {
     }
 
     return res.status(200).json({ message: "Comentarios obtenidos", comments });
-  } catch (err: any) {
-    return res.status(400).json({ error:"Error al obtener comentarios" });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
 }
-
 
 export async function getAllCommentsController(req: Request, res: Response) {
   try {
     const comments = await getAllComments();
     return res.status(200).json({ comments });
-  } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
 }
-
 
 export async function addCommentController(req: Request, res: Response) {
   try {
@@ -66,8 +70,11 @@ export async function addCommentController(req: Request, res: Response) {
     return res
       .status(200)
       .json({ message: "Comentario agregado exitosamente", comment });
-  } catch (err: any) {
-    return res.status(400).json({ error:"Error al agregar comentario" });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
 }
 
@@ -85,8 +92,11 @@ export async function updateCommentController(req: Request, res: Response) {
     return res
       .status(200)
       .json({ message: "Comentario actualizado exitosamente", updated });
-  } catch (err: any) {
-    return res.status(400).json({ error:"Error al actualizar comentario" });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
 }
 
@@ -101,7 +111,10 @@ export async function deleteCommentController(req: Request, res: Response) {
     }
 
     return res.status(200).json({ message: "Comentario eliminado correctamente" });
-  } catch (err: any) {
-    return res.status(400).json({ error: "Error al eliminar comentario" });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
 }
