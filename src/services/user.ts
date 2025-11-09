@@ -26,6 +26,7 @@ export async function createUser(
     .select();
 
   if (error) throw new Error(error.message);
+
   return data[0];
 }
 
@@ -34,12 +35,16 @@ export async function getUserByEmail(email: string) {
     .from("users")
     .select("*")
     .eq("email", email);
+
   if (error) throw new Error(error.message);
+
   return data[0];
 }
 export async function getUserById(id: string) {
   const { data, error } = await supabase.from("users").select("*").eq("id", id);
+
   if (error) throw new Error(error.message);
+
   return data[0];
 }
 
@@ -48,15 +53,20 @@ export async function getUserByUsername(username: string) {
     .from("usernames")
     .select("*")
     .eq("username", username);
+
   if (usernameError) throw new Error(usernameError.message);
+
   if (!usernameData || usernameData.length === 0) return null;
+
   const username_id = usernameData[0].id;
 
   const { data: userData, error: userError } = await supabase
     .from("users")
     .select("*")
     .eq("username_id", username_id);
+
   if (userError) throw new Error(userError.message);
+
   return userData;
 }
 
@@ -67,7 +77,9 @@ export async function updateUser(id: string, updates: Record<string, unknown>) {
     .eq("id", id)
     .select()
     .maybeSingle();
+
   if (error) throw new Error(error.message);
+
   return data;
 }
 
@@ -99,7 +111,9 @@ export async function changePassword(id: string, newPassword: string) {
       .update({ password: hashedPassword })
       .eq("id", id)
       .select();
+
     if (error) throw new Error(error.message);
+
     return data[0];
   } catch (err) {
     throw new Error((err as Error).message);

@@ -13,6 +13,7 @@ import {
 } from "../services/business";
 import { addUsername } from "../services/usernames";
 import { Request, Response } from "express";
+import validator from "validator";
 
 export async function registerBusiness(req: Request, res: Response) {
   try {
@@ -26,8 +27,7 @@ export async function registerBusiness(req: Request, res: Response) {
       });
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (typeof email !== "string" || !emailRegex.test(email)) {
+    if (!validator.isEmail(email)) {
       return res.status(400).json({ error: "Email inválido" });
     }
 
@@ -56,27 +56,15 @@ export async function registerBusiness(req: Request, res: Response) {
         .json({ error: "La contraseña debe tener al menos 8 caracteres" });
     }
 
-    const forbiddenPatterns = [
-      /(\bSELECT\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b|\bDROP\b|\bCREATE\b)/i, // SQL keywords
-      /(\bUNION\b|\bOR\b.*=.*\b|\bAND\b.*=.*\b)/i, // SQL injection patterns
-      /['"`;\\]/g,
-      /^\s+$/,
-    ];
+    const hasLetter = /[a-zA-Z]/.test(passwordStr);
+    const hasNumber = /\d/.test(passwordStr);
 
-    const hasForbiddenPattern = forbiddenPatterns.some((pattern) =>
-      pattern.test(passwordStr),
-    );
-    if (hasForbiddenPattern) {
-      return res.status(400).json({
-        error: "La contraseña contiene caracteres o patrones no permitidos",
-      });
-    }
-
-    if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(passwordStr)) {
+    if (!hasLetter || !hasNumber) {
       return res.status(400).json({
         error: "La contraseña debe contener al menos una letra y un número",
       });
     }
+
     const existingEmail = await getBusinessByEmail(email);
     const existingUsername = await getBusinessByUsername(username);
     if (existingEmail || existingUsername) {
@@ -98,14 +86,14 @@ export async function registerBusiness(req: Request, res: Response) {
     );
     const safeUser = created
       ? {
-          id: created.id,
-          name: created.name,
-          username_id: created.username_id,
-          email: created.email,
-          category: created.category,
-          description: created.description,
-          address: created.address,
-        }
+        id: created.id,
+        name: created.name,
+        username_id: created.username_id,
+        email: created.email,
+        category: created.category,
+        description: created.description,
+        address: created.address,
+      }
       : null;
     return res.status(201).json(safeUser);
   } catch (error) {
@@ -164,7 +152,7 @@ export async function loginBusiness(req: Request, res: Response) {
 }
 
 export async function editBusinessController(req: Request, res: Response) {
-  const businessId = req.params.businesId;
+  const businessId = req.params.businessId;
   const body = req.body;
   const toUpdate: Record<string, unknown> = {};
 
@@ -187,7 +175,7 @@ export async function editBusinessController(req: Request, res: Response) {
 
 export async function deleteBusinessController(req: Request, res: Response) {
   const businessId = req.params.businessId;
-  const validBusinessId = getBusinessById(businessId);
+  const validBusinessId = await getBusinessById(businessId);
 
   if (!validBusinessId) {
     return res.status(404).json({ error: "No existe el negocio" });
@@ -207,17 +195,12 @@ export async function changePasswordController(req: Request, res: Response) {
   if (!Password) {
     return res.status(404).json({ error: "Negocio no encontrado" });
   }
-  if (oldPassword == newPassword) {
-    return res.status(400).json({ error: "Las contraseñas son iguales" });
-  }
-  if (!Password) {
-    return res.status(400).json({ error: "No se encontro el negocio" });
-  }
-
   const verify = await bcrypt.compare(oldPassword, Password);
-
   if (!verify) {
     return res.status(400).json({ error: "La contraseña actual no coincide" });
+  }
+  if (oldPassword === newPassword) {
+    return res.status(400).json({ error: "Las contraseñas son iguales" });
   }
   const passwordNew = await changePassword(businessId, newPassword);
 

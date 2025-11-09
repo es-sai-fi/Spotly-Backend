@@ -17,17 +17,33 @@ export async function getUsernamebyId(username_id: string) {
     .from("usernames")
     .select("*")
     .eq("id", username_id)
-    .single();
+    .maybeSingle();
+
   if (error) throw new Error(error.message);
+
+  return data;
+}
+
+export async function getUsernameByName(username: string) {
+  const { data, error } = await supabase
+    .from("usernames")
+    .select("*")
+    .eq("username", username)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+
   return data;
 }
 
 export async function updateUsername(username_id: string, username: string) {
   const { data, error } = await supabase
     .from("usernames")
-    .update([{ username: username }])
+    .update({ username: username })
     .eq("id", username_id)
-    .select();
+    .select()
+    .maybeSingle();
+
   if (error) throw new Error(error.message);
 
   return data;

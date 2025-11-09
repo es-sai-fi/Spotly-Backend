@@ -114,7 +114,7 @@ export async function deleteBusiness(business_id: string) {
       .delete()
       .eq("id", deletedBusiness.username_id);
   }
-  return data && data.length > 0 ? data[0] : null;
+  return data[0];
 }
 
 export async function changePassword(id: string, newPassword: string) {

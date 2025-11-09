@@ -9,11 +9,12 @@ import postsRoutes from "./routes/post";
 import commentsRoutes from "./routes/comments";
 dotenv.config();
 
-const app = express();
 if (!process.env.PORT) {
+  console.error("Error: PORT environment variable is not set. Please set PORT in your environment or .env file.");
   process.exit(1);
 }
 
+const app = express();
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
