@@ -98,11 +98,9 @@ export async function registerBusiness(req: Request, res: Response) {
     return res.status(201).json(safeUser);
   } catch (error) {
     if (error instanceof Error) {
-      console.error(error.message);
       return res.status(500).json({ error: error.message });
     }
-    console.error(error);
-    return res.status(500).json({ error: "Unexpected error occurred" });
+    return res.status(500).json({ error: "Error inesperado" });
   }
 }
 
@@ -146,88 +144,119 @@ export async function loginBusiness(req: Request, res: Response) {
         address: business.address,
       },
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
     return res.status(500).json({ error: "Error inesperado" });
   }
 }
 
 export async function editBusinessController(req: Request, res: Response) {
-  const businessId = req.params.businessId;
-  const body = req.body;
-  const toUpdate: Record<string, unknown> = {};
+  try {
+    const businessId = req.params.businessId;
+    const body = req.body;
+    const toUpdate: Record<string, unknown> = {};
 
-  if (typeof body.name === "string") toUpdate.name = body.name;
-  if (typeof body.description === "string")
-    toUpdate.description = body.description;
-  if (typeof body.email === "string") toUpdate.email = body.email;
-  if (typeof body.address === "string") toUpdate.address = body.address;
+    if (typeof body.name === "string") toUpdate.name = body.name;
+    if (typeof body.description === "string")
+      toUpdate.description = body.description;
+    if (typeof body.email === "string") toUpdate.email = body.email;
+    if (typeof body.address === "string") toUpdate.address = body.address;
 
-  const editedBusiness = await editBusiness(businessId, toUpdate);
-  if (!editedBusiness) {
+    const editedBusiness = await editBusiness(businessId, toUpdate);
+    if (!editedBusiness) {
+      return res
+        .status(400)
+        .json({ error: "Hubo un error editando la información" });
+    }
     return res
-      .status(400)
-      .json({ error: "Hubo un error editando la información" });
+      .status(200)
+      .json({ message: "Información editada exitosamente", toUpdate });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
-  return res
-    .status(200)
-    .json({ message: "Información editada exitosamente", toUpdate });
 }
 
 export async function deleteBusinessController(req: Request, res: Response) {
-  const businessId = req.params.businessId;
-  const validBusinessId = await getBusinessById(businessId);
+  try {
+    const businessId = req.params.businessId;
+    const validBusinessId = await getBusinessById(businessId);
 
-  if (!validBusinessId) {
-    return res.status(404).json({ error: "No existe el negocio" });
+    if (!validBusinessId) {
+      return res.status(404).json({ error: "No existe el negocio" });
+    }
+    const businessDeleted = await deleteBusiness(businessId);
+    if (!businessDeleted) {
+      return res.status(400).json({ error: "No se pudo eliminar el negocio" });
+    }
+    return res.status(200).json({ message: "Negocio eliminado exitosamente" });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
-  const businessDeleted = await deleteBusiness(businessId);
-  if (!businessDeleted) {
-    return res.status(400).json({ error: "No se pudo eliminar el negocio" });
-  }
-  return res.status(200).json({ message: "Negocio eliminado exitosamente" });
 }
 
 export async function changePasswordController(req: Request, res: Response) {
-  const businessId = req.params.businessId;
-  const { oldPassword, newPassword } = req.body;
-  const Password = await getBusinessByIdPassword(businessId);
+  try {
+    const businessId = req.params.businessId;
+    const { oldPassword, newPassword } = req.body;
+    const Password = await getBusinessByIdPassword(businessId);
 
-  if (!Password) {
-    return res.status(404).json({ error: "Negocio no encontrado" });
-  }
-  const verify = await bcrypt.compare(oldPassword, Password);
-  if (!verify) {
-    return res.status(400).json({ error: "La contraseña actual no coincide" });
-  }
-  if (oldPassword === newPassword) {
-    return res.status(400).json({ error: "Las contraseñas son iguales" });
-  }
-  const passwordNew = await changePassword(businessId, newPassword);
+    if (!Password) {
+      return res.status(404).json({ error: "Negocio no encontrado" });
+    }
+    const verify = await bcrypt.compare(oldPassword, Password);
+    if (!verify) {
+      return res.status(400).json({ error: "La contraseña actual no coincide" });
+    }
+    if (oldPassword === newPassword) {
+      return res.status(400).json({ error: "Las contraseñas son iguales" });
+    }
+    const passwordNew = await changePassword(businessId, newPassword);
 
-  if (!passwordNew) {
-    return res.status(400).json({ error: "Error al cambiar la contraseña" });
+    if (!passwordNew) {
+      return res.status(400).json({ error: "Error al cambiar la contraseña" });
+    }
+    return res
+      .status(200)
+      .json({ message: "Contraseña Actualizada exitosamente" });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
-  return res
-    .status(200)
-    .json({ message: "Contraseña Actualizada exitosamente" });
 }
 
 export async function getBusinessRatingById(req: Request, res: Response) {
-  const businessId = req.params.businessId;
-  const business = await getBusinessById(businessId);
+  try {
+    const businessId = req.params.businessId;
+    const business = await getBusinessById(businessId);
 
-  if (!businessId) {
-    return res.status(404).json({ error: "El id no fue proporcionado." });
+    if (!businessId) {
+      return res.status(404).json({ error: "El id no fue proporcionado." });
+    }
+
+    if (!business) {
+      return res.status(404).json({ error: "Negocio no encontrado" });
+    }
+
+    const ratingData = await businessRatingById(businessId);
+    if (!ratingData) {
+      return res.status(400).json({ error: "Error al mostrar el rating" });
+    }
+
+    return res.status(200).json(ratingData);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Error inesperado" });
   }
-
-  if (!business) {
-    return res.status(404).json({ error: "Negocio no encontrado" });
-  }
-
-  const ratingData = await businessRatingById(businessId);
-  if (!ratingData) {
-    return res.status(400).json({ error: "Error al mostrar el rating" });
-  }
-
-  return res.status(200).json(ratingData);
 }

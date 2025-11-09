@@ -4,7 +4,7 @@ import { supabase } from "../../src/config/database";
 
 describe("Integration - editBusinessController", () => {
   const registerEndpoint = "/api/businesses/register";
-  const editEndpoint = (id: string) => `/api/businesses/edit/${id}`;
+  const editEndpoint = "/api/businesses/edit";
 
   const testEmail = `editbiz_${Date.now()}@mail.com`;
   const testUsername = `edituser_${Date.now()}`;
@@ -40,8 +40,9 @@ describe("Integration - editBusinessController", () => {
   });
 
   it("should return 400 if update fails (invalid id)", async () => {
+    const fakeId = "00000000-0000-0000-0000-000000000000";
     const res = await request(app)
-      .put(editEndpoint("nonexistent-id"))
+      .put(`${editEndpoint}/${fakeId}`)
       .send({ name: "New Name" });
 
     expect(res.status).toBe(400);
@@ -50,7 +51,7 @@ describe("Integration - editBusinessController", () => {
 
   it("should return 200 and update business info successfully", async () => {
     const res = await request(app)
-      .put(editEndpoint(businessId!))
+      .put(`${editEndpoint}/${businessId}`)
       .send({
         name: "Updated Name",
         description: "Updated description",
@@ -68,7 +69,7 @@ describe("Integration - editBusinessController", () => {
 
   it("should ignore invalid fields and still return 200", async () => {
     const res = await request(app)
-      .put(editEndpoint(businessId!))
+      .put(`${editEndpoint}/${businessId}`)
       .send({
         name: "Another Name",
         invalidField: "should be ignored",

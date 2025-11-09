@@ -94,6 +94,7 @@ describe("Integration - registerBusiness", () => {
       username: testUsername,
       category: testCategory,
       password: testPassword,
+      rating: 5,
       description: "Test description",
       address: "Fake Street 123",
     });

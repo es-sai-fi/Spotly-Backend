@@ -91,12 +91,10 @@ describe("Integration - loginBusiness", () => {
     expect(res.body.user).toHaveProperty("email", testEmail);
   });
 
-  it("should return 500 if an unexpected error occurs", async () => {
+  it("should return 500 and the error message if an unexpected error occurs", async () => {
     const spy = jest
       .spyOn(businessService, "getBusinessByEmail")
-      .mockImplementationOnce(() => {
-        throw new Error("Simulated internal error");
-      });
+      .mockRejectedValueOnce(new Error("Fallo en la base de datos"));
 
     const res = await request(app).post(loginEndpoint).send({
       email: `crashlogin_${Date.now()}@mail.com`,
@@ -104,7 +102,7 @@ describe("Integration - loginBusiness", () => {
     });
 
     expect(res.status).toBe(500);
-    expect(res.body.error).toBe("Error inesperado");
+    expect(res.body.error).toBe("Fallo en la base de datos");
 
     spy.mockRestore();
   });
