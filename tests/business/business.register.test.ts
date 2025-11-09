@@ -5,7 +5,6 @@ import * as businessService from "../../src/services/business";
 
 describe("Integration - registerBusiness", () => {
   const registerEndpoint = "/api/businesses/register";
-
   const testEmail = `biz_${Date.now()}@mail.com`;
   const testUsername = `bizuser_${Date.now()}`;
   const testPassword = "abc12345";

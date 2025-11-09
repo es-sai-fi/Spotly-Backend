@@ -5,8 +5,9 @@ import { addUsername } from "../../src/services/usernames";
 
 describe("Integration - getUsernamebyIdController", () => {
   const getUsernameByIdEndpoint = "/api/username";
-  let usernameId: string;
   const testUsername = `test_user_${Date.now()}`;
+
+  let usernameId: string;
 
   beforeAll(async () => {
     const inserted = await addUsername(testUsername);

@@ -11,6 +11,7 @@ describe("Integration - changePasswordController", () => {
   const testUsername = `username_${Date.now()}`;
   const testPassword = "secure1234";
   const newPassword = "newsecure1234";
+
   let userId: string;
   let usernameId: string;
 

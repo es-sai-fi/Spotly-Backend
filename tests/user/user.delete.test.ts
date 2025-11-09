@@ -9,6 +9,7 @@ describe("Integration - deleteUserController", () => {
   const testEmail = `test_${Date.now()}@mail.com`;
   const testUsername = `username_${Date.now()}`;
   const testPassword = "secure1234";
+
   let userId: string;
   let usernameId: string;
 

@@ -5,12 +5,12 @@ import { addUsername } from "../../src/services/usernames";
 
 describe("Integration - updateAUsernameById", () => {
   const usernameUpdateEndpoint = "/api/username/updateUsername";
-  let usernameId: string;
-  let otherUsernameId: string;
-
   const initialUsername = `user_${Date.now()}`;
   const newUsername = `updated_${Date.now()}`;
   const otherUsername = `other_${Date.now()}`;
+
+  let usernameId: string;
+  let otherUsernameId: string;
 
   beforeAll(async () => {
     // Creates the test user 

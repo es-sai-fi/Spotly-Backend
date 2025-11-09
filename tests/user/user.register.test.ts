@@ -8,6 +8,7 @@ describe("Integration - registerUser", () => {
   const testEmail = `register_${Date.now()}@mail.com`;
   const testUsername = `user_${Date.now()}`;
   const testPassword = "abc12345";
+
   let userId: string;
   let usernameId: string;
 

@@ -6,7 +6,6 @@ import * as businessService from "../../src/services/business";
 describe("Integration - loginBusiness", () => {
   const loginEndpoint = "/api/businesses/login";
   const registerEndpoint = "/api/businesses/register";
-
   const testEmail = `loginbiz_${Date.now()}@mail.com`;
   const testUsername = `loginuser_${Date.now()}`;
   const testPassword = "abc12345";
@@ -94,7 +93,7 @@ describe("Integration - loginBusiness", () => {
   it("should return 500 and the error message if an unexpected error occurs", async () => {
     const spy = jest
       .spyOn(businessService, "getBusinessByEmail")
-      .mockRejectedValueOnce(new Error("Fallo en la base de datos"));
+      .mockRejectedValueOnce(new Error("Simulated failure"));
 
     const res = await request(app).post(loginEndpoint).send({
       email: `crashlogin_${Date.now()}@mail.com`,
@@ -102,7 +101,7 @@ describe("Integration - loginBusiness", () => {
     });
 
     expect(res.status).toBe(500);
-    expect(res.body.error).toBe("Fallo en la base de datos");
+    expect(res.body.error).toBe("Simulated failure");
 
     spy.mockRestore();
   });

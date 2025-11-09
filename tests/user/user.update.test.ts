@@ -9,6 +9,7 @@ describe("Integration - updateAUser", () => {
   const testEmail = `update_${Date.now()}@mail.com`;
   const testUsername = `updateUser_${Date.now()}`;
   const testPassword = "update1234";
+
   let userId: string;
   let usernameId: string;
 

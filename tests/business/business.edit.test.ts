@@ -1,11 +1,11 @@
 import request from "supertest";
 import app from "../../src/app";
 import { supabase } from "../../src/config/database";
+import * as businessService from "../../src/services/business";
 
 describe("Integration - editBusinessController", () => {
   const registerEndpoint = "/api/businesses/register";
   const editEndpoint = "/api/businesses/edit";
-
   const testEmail = `editbiz_${Date.now()}@mail.com`;
   const testUsername = `edituser_${Date.now()}`;
   const testPassword = "abc12345";
@@ -79,5 +79,22 @@ describe("Integration - editBusinessController", () => {
     expect(res.body.message).toBe("Información editada exitosamente");
     expect(res.body.toUpdate).toHaveProperty("name", "Another Name");
     expect(res.body.toUpdate).not.toHaveProperty("invalidField");
+  });
+
+  it("should return 500 if an unexpected error occurs", async () => {
+    const spy = jest
+      .spyOn(businessService, "editBusiness")
+      .mockRejectedValueOnce(new Error("Simulated failure"));
+
+    const res = await request(app)
+      .put(`${editEndpoint}/${businessId}`)
+      .send({
+        name: "Error Test Name",
+      });
+
+    expect(res.status).toBe(500);
+    expect(res.body.error).toBe("Simulated failure");
+
+    spy.mockRestore();
   });
 });
