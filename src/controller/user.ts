@@ -5,7 +5,7 @@ import {
   getUserByUsername,
   updateUser,
   deleteUser,
-  changePassword,
+  changeUserPassword,
   getUserById,
 } from "../services/user";
 import { addUsername } from "../services/usernames";
@@ -50,12 +50,15 @@ export async function registerUser(req: Request, res: Response) {
       return res.status(400).json({ error: "Edad inválida" });
     }
 
-    const passwordStr =
-      typeof password === "string"
-        ? password
-        : typeof password === "number"
-          ? String(password)
-          : null;
+    let passwordStr: string | null;
+
+    if (typeof password === "string") {
+      passwordStr = password;
+    } else if (typeof password === "number") {
+      passwordStr = String(password);
+    } else {
+      passwordStr = null;
+    }
 
     if (!passwordStr || passwordStr.length < 8) {
       return res
@@ -92,12 +95,12 @@ export async function registerUser(req: Request, res: Response) {
     );
     const safeUser = created
       ? {
-        id: created.id,
-        email: created.email,
-        username_id: created.username_id,
-        name: created.name,
-        age: created.age,
-      }
+          id: created.id,
+          email: created.email,
+          username_id: created.username_id,
+          name: created.name,
+          age: created.age,
+        }
       : null;
     return res.status(201).json(safeUser);
   } catch (error) {
@@ -221,7 +224,7 @@ export async function changePasswordController(req: Request, res: Response) {
         .json({ error: "La contraseña actual no coincide" });
     }
 
-    const passwordNew = await changePassword(userId, newPassword);
+    const passwordNew = await changeUserPassword(userId, newPassword);
 
     if (!passwordNew) {
       return res.status(400).json({ error: "Error al cambiar la contraseña" });
