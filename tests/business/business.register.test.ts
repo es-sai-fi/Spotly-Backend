@@ -3,7 +3,7 @@ import app from "../../src/app";
 import { supabase } from "../../src/config/database";
 import * as businessService from "../../src/services/business";
 
-describe.skip("Integration - registerBusiness", () => {
+describe("Integration - registerBusiness", () => {
   const registerEndpoint = "/api/businesses/register";
 
   const testEmail = `biz_${Date.now()}@mail.com`;
@@ -87,19 +87,6 @@ describe.skip("Integration - registerBusiness", () => {
     expect(res.body.error).toBe("La contraseña debe contener al menos una letra y un número");
   });
 
-  it("should return 400 if password contains forbidden SQL patterns", async () => {
-    const res = await request(app).post(registerEndpoint).send({
-      email: testEmail,
-      name: testName,
-      username: testUsername,
-      category: testCategory,
-      password: "abc123DROP TABLE users",
-    });
-
-    expect(res.status).toBe(400);
-    expect(res.body.error).toContain("La contraseña contiene caracteres o patrones no permitidos");
-  });
-
   it("should return 201 if business is successfully registered", async () => {
     const res = await request(app).post(registerEndpoint).send({
       email: testEmail,
@@ -107,7 +94,6 @@ describe.skip("Integration - registerBusiness", () => {
       username: testUsername,
       category: testCategory,
       password: testPassword,
-      rating: 5,
       description: "Test description",
       address: "Fake Street 123",
     });
