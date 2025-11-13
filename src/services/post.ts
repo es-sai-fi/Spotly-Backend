@@ -83,7 +83,7 @@ export async function deletePost(postId: string) {
 export async function getPostById(postId: string) {
   const { data, error } = await supabase
     .from("posts")
-    .select("image_url")
+    .select("*")
     .eq("id", postId)
     .maybeSingle();
 
@@ -91,11 +91,11 @@ export async function getPostById(postId: string) {
 
   return data;
 }
-export async function getAllPostBusiness(businessId:string) {
+export async function getAllPostBusiness(businessId: string) {
   const { data, error } = await supabase
-  .from("posts")
-  .select("*")
-  .eq("business_id",businessId)
+    .from("posts")
+    .select("*")
+    .eq("business_id", businessId)
   if (error) throw new Error(error.message);
 
   return data;
@@ -103,8 +103,8 @@ export async function getAllPostBusiness(businessId:string) {
 
 export async function getAllPost() {
   const { data, error } = await supabase
-  .from("posts")
-  .select("*")
+    .from("posts")
+    .select("*")
   if (error) throw new Error(error.message);
 
   return data;
