@@ -103,7 +103,7 @@ export async function deleteUser(user_id: string) {
   return data && data.length > 0 ? data[0] : null;
 }
 
-export async function changeUserPassword(
+export async function changePassword(
   userId: string,
   newUserPassword: string,
 ) {
