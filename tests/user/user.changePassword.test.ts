@@ -113,7 +113,7 @@ describe("Integration - changePasswordController", () => {
       .spyOn(userService, "getUserById")
       .mockResolvedValueOnce(mockUser as any);
     const spyChange = jest
-      .spyOn(userService, "changePassword")
+      .spyOn(userService, "changeUserPassword")
       .mockResolvedValueOnce(true as any);
 
     const res = await request(app)
