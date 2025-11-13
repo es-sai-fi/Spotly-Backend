@@ -12,7 +12,7 @@ import { getPostById } from "../services/post";
 
 export async function getCommentsByPostController(req: Request, res: Response) {
   try {
-    const { postId } = req.body;
+    const { postId } = req.params;
 
     const validPost = await getPostById(postId);
     if (!validPost) {
@@ -20,7 +20,7 @@ export async function getCommentsByPostController(req: Request, res: Response) {
     }
 
     const comments = await getCommentsByPost(postId);
-    if (!comments) {
+    if (!comments || comments.length === 0) {
       return res
         .status(400)
         .json({ error: "No se pudo obtener los comentarios" });
