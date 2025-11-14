@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import helmet from "helmet";
 import userRoutes from "./routes/user";
 import businessRoutes from "./routes/business";
@@ -7,12 +8,22 @@ import usernameRoutes from "./routes/username";
 
 dotenv.config();
 
+const frontendOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+
 if (!process.env.PORT) {
-  console.error("Error: PORT environment variable is not set. Please set PORT in your environment or .env file.");
+  console.error(
+    "Error: PORT environment variable is not set. Please set PORT in your environment or .env file.",
+  );
   process.exit(1);
 }
 
 const app = express();
+app.use(
+  cors({
+    origin: frontendOrigin,
+    credentials: true,
+  }),
+);
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
