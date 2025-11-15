@@ -6,27 +6,32 @@ export async function createBusiness(
   email: string,
   name: string,
   category: string,
-  rating: number,
+  rating: number | undefined,
   description: string,
   address: string,
   password: string,
 ) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  // Preparar el objeto de inserción sin rating si no se proporciona
+  const businessData: any = {
+    username_id,
+    email,
+    name,
+    category,
+    description,
+    address,
+    password: hashedPassword,
+  };
+
+  // Solo agregar rating si existe en la tabla
+  // if (rating !== undefined) {
+  //   businessData.rating = rating;
+  // }
+
   const { data, error } = await supabase
     .from("businesses")
-    .insert([
-      {
-        username_id,
-        email,
-        name,
-        category,
-        rating,
-        description,
-        address,
-        password: hashedPassword,
-      },
-    ])
+    .insert([businessData])
     .select();
 
   if (error) throw new Error(error.message);

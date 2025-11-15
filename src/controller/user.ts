@@ -8,6 +8,7 @@ import {
   changeUserPassword,
   getUserById,
 } from "../services/user";
+import { getBusinessByEmail } from "../services/business";
 import { addUsername } from "../services/usernames";
 import { generateToken } from "../services/auth";
 import { Request, Response } from "express";
@@ -125,27 +126,64 @@ export async function loginUser(req: Request, res: Response) {
         .json({ error: "La contraseña no ha sido proporcionada" });
     }
 
+    // Intentar buscar primero como usuario
     const user = await getUserByEmail(email);
-    if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+    
+    if (user) {
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword)
+        return res.status(400).json({ error: "Contraseña incorrecta" });
+      
+      const token = generateToken({
+        id: user.id,
+        email: user.email,
+        type: 'user'
+      });
 
-    const validPassword = await bcrypt.compare(password, user.password);
+      return res.status(200).json({
+        message: "Login exitoso",
+        token,
+        userType: 'user',
+        user: {
+          id: user.id,
+          username_id: user.username_id,
+          name: user.name,
+          email: user.email,
+          surname: user.surname,
+          age: user.age,
+        },
+      });
+    }
+
+    // Si no es usuario, intentar como negocio
+    const business = await getBusinessByEmail(email);
+    
+    if (!business) {
+      return res.status(404).json({ error: "Usuario o negocio no encontrado" });
+    }
+
+    const validPassword = await bcrypt.compare(password, business.password);
     if (!validPassword)
       return res.status(400).json({ error: "Contraseña incorrecta" });
+    
     const token = generateToken({
-      id: user.id,
-      email: user.email,
+      id: business.id,
+      email: business.email,
+      type: 'business'
     });
 
     return res.status(200).json({
       message: "Login exitoso",
       token,
-      user: {
-        id: user.id,
-        username_id: user.username_id,
-        name: user.name,
-        email: user.email,
-        surname: user.surname,
-        age: user.age,
+      userType: 'business',
+      business: {
+        id: business.id,
+        username_id: business.username_id,
+        name: business.name,
+        email: business.email,
+        category: business.category,
+        description: business.description,
+        address: business.address,
       },
     });
   } catch (error) {

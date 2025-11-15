@@ -111,3 +111,7 @@ dist
 .vite-temp/
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Database setup files (local configuration)
+SETUP_DATABASE.sql
+*.setup.sql
