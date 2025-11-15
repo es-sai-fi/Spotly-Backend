@@ -1,13 +1,32 @@
 import type { Config } from 'jest';
 
 const config: Config = {
+  preset: 'ts-jest',
   clearMocks: true,
   collectCoverage: true,
   coverageDirectory: "coverage",
   coverageProvider: "v8",
+  coverageThreshold: {
+    global: {
+      branches: 60,
+      functions: 60,
+      lines: 60,
+      statements: 60,
+    },
+  },
+  coveragePathIgnorePatterns: [
+    "node_modules/",
+    "build",
+    "src/config/",
+    "src/services/business.ts", // Skipping for now
+    "src/controller/business.ts", // Skipping for now
+    "src/services/auth.ts", // Not relevant
+  ],
+  testEnvironment: 'node',
   testMatch: [
-    "./tests/**/*.ts",
-  ]
+    "<rootDir>/tests/**/*.test.ts",
+  ],
+  moduleFileExtensions: ['ts', 'js', 'json', 'node'],
 };
 
 export default config;
