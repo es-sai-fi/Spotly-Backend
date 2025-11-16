@@ -107,18 +107,14 @@ export async function changeUserPassword(
   userId: string,
   newUserPassword: string,
 ) {
-  try {
-    const hashedUserPassword = await bcrypt.hash(newUserPassword, 10);
-    const { data, error } = await supabase
-      .from("users")
-      .update({ password: hashedUserPassword })
-      .eq("id", userId)
-      .select();
+  const hashedUserPassword = await bcrypt.hash(newUserPassword, 10);
+  const { data, error } = await supabase
+    .from("users")
+    .update({ password: hashedUserPassword })
+    .eq("id", userId)
+    .select();
 
-    if (error) throw new Error(error.message);
+  if (error) throw new Error(error.message);
 
-    return data[0];
-  } catch (err) {
-    throw new Error((err as Error).message);
-  }
+  return data[0];
 }
