@@ -198,26 +198,35 @@ export async function deleteBusinessController(req: Request, res: Response) {
 }
 
 export async function changePasswordController(req: Request, res: Response) {
-  const businessId = req.params.businessId;
-  const { oldPassword, newPassword } = req.body;
-  const Password = await getBusinessByIdPassword(businessId);
+  try {
+    const businessId = req.params.businessId;
+    const { oldPassword, newPassword } = req.body;
+    const Password = await getBusinessByIdPassword(businessId);
 
-  if (!Password) {
-    return res.status(404).json({ error: "Negocio no encontrado" });
-  }
-  const verify = await bcrypt.compare(oldPassword, Password);
-  if (!verify) {
-    return res.status(400).json({ error: "La contraseña actual no coincide" });
-  }
-  if (oldPassword === newPassword) {
-    return res.status(400).json({ error: "Las contraseñas son iguales" });
-  }
-  const passwordNew = await changePassword(businessId, newPassword);
+    if (!Password) {
+      return res.status(404).json({ error: "Negocio no encontrado" });
+    }
+    const verify = await bcrypt.compare(oldPassword, Password);
+    if (!verify) {
+      return res.status(400).json({ error: "La contraseña actual no coincide" });
+    }
+    if (oldPassword === newPassword) {
+      return res.status(400).json({ error: "Las contraseñas son iguales" });
+    }
+    const passwordNew = await changePassword(businessId, newPassword);
 
-  if (!passwordNew) {
-    return res.status(400).json({ error: "Error al cambiar la contraseña" });
+    if (!passwordNew) {
+      return res.status(400).json({ error: "Error al cambiar la contraseña" });
+    }
+    return res
+      .status(200)
+      .json({ message: "Contraseña Actualizada exitosamente" });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+      return res.status(500).json({ error: error.message });
+    }
+    console.error(error);
+    return res.status(500).json({ error: "Unexpected error occurred" });
   }
-  return res
-    .status(200)
-    .json({ message: "Contraseña Actualizada exitosamente" });
 }
