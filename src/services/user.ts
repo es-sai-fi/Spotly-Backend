@@ -100,7 +100,7 @@ export async function deleteUser(user_id: string) {
     await supabase.from("usernames").delete().eq("id", deletedUser.username_id);
   }
 
-  return data && data.length > 0 ? data[0] : null;
+  return data[0];
 }
 
 export async function changeUserPassword(
