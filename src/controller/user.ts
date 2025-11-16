@@ -215,8 +215,8 @@ export async function changePasswordController(req: Request, res: Response) {
       return res.status(400).json({ error: "Las contraseñas son iguales" });
     }
 
-    const actPasword = Password.password;
-    const verify = await bcrypt.compare(oldPassword, actPasword);
+    const actPassword = Password.password;
+    const verify = await bcrypt.compare(oldPassword, actPassword);
 
     if (!verify) {
       return res
